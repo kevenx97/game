@@ -17,12 +17,14 @@ export default class Stage extends React.Component {
     super();
 
     this.state = {
-      translate: new Animated.Value(10),
       pan: new Animated.ValueXY(),
       figures: [
-        { id: 3, nome: 'java', image: require('../assets/java.png') },
-        { id: 1, nome: 'react', image: require('../assets/react.png') },
-        { id: 2, nome: 'angular', image: require('../assets/angular.png') }
+        { id: 1, nome: 'java', image: require('../assets/java.png'), animated: false, translate: new Animated.Value(-80) },
+        { id: 2, nome: 'react', image: require('../assets/react.png'), animated: false, translate: new Animated.Value(-80) },
+        { id: 3, nome: 'angular', image: require('../assets/angular.png'), animated: false, translate: new Animated.Value(-80) },
+        { id: 4, nome: 'python', image: require('../assets/python.png'), animated: false, translate: new Animated.Value(-80) },
+        { id: 5, nome: 'xamarin', image: require('../assets/xamarin.png'), animated: false, translate: new Animated.Value(-80) },
+        { id: 6, nome: 'ionic', image: require('../assets/ionic.png'), animated: false, translate: new Animated.Value(-80) }
       ]
     };
 
@@ -41,10 +43,44 @@ export default class Stage extends React.Component {
   }
 
   componentDidMount() {
-    Animated.timing(this.state.translate, {
-      toValue: this.window.height,
-      duration: 10000
-    }).start()
+    setInterval(() => {
+      let figures = this.state.figures
+      let figuresRandom = []
+      let figuresTemp = [...figures]
+
+      const figureAnimated = figures[Math.floor(Math.random() * figures.length)]
+
+      figures.map((item, index) => {
+        if (figureAnimated.animated == true && item.animated == true) {
+          return false
+        }
+
+        if (item.id === figureAnimated.id) {
+          figures[index].animated = true
+
+          Animated.timing(figures[index].translate, {
+            toValue: this.window.height,
+            duration: 4000,
+            useNativeDriver: true
+          }).start(() => {
+            figures[index].animated = false
+
+            // PEGAR O ITEM DO ARRAY E MUDA-LO DE LUGAR
+
+            // for (let i = 0; i < figures.length - 1; i++) {
+            //   figuresRandom.push(figuresTemp.splice(Math.floor(Math.random() * figuresTemp.length), 1)[0])
+            // }
+      
+            // figuresRandom.push(figuresTemp[0])
+            // figures = figuresRandom
+          })
+        }
+      })
+
+      this.setState({ figures })
+      
+
+    }, 2000)
   }
 
   render() {
@@ -52,26 +88,29 @@ export default class Stage extends React.Component {
       transform: this.state.pan.getTranslateTransform()
     }
 
-    const translateY = {
-      transform: [{
-        translateY: this.state.translate
-      }]
-    }
-
     return (
-      <View style={style.content}>
+      <View style={style.content} >
         <FlatList
-          numColumns={3}
+          numColumns={6}
           contentContainerStyle={{ flex: 1, width: this.window.width }}
           data={this.state.figures}
-          renderItem={({ item, index }) => (
-            <Animated.View style={[translateY, { width: 50, height: 50, zIndex: 999999, position: 'absolute', backgroundColor: "#000" }]} source={item.image} />
-          )}
+          renderItem={({ item, index }) => {
+
+            const translateY = {
+              transform: [{ translateY: this.state.figures[index].translate }]
+            }
+
+            return (
+              <View style={{ height: this.window.height, flex: 1 }}>
+                <Animated.Image style={item.animated ? [translateY, { opacity: 1 }] : { opacity: 0 }} source={item.image} />
+              </View>
+            )
+          }}
           keyExtractor={(item) => item.id.toString()}
         />
 
         <Animated.View
-          style={[style.square, panStyle,]}
+          style={[style.square, panStyle]}
           {...this.panResponder.panHandlers}
         />
       </View>
