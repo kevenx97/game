@@ -1,19 +1,32 @@
 import React from 'react'
 
-import { View, Text, TouchableNativeFeedback, StyleSheet, Image } from 'react-native'
+import { 
+  View,
+  Text,
+  TouchableNativeFeedback,
+  StyleSheet,
+  Image,
+  ImageBackground
+} from 'react-native'
 
-export const Menu = () => (
-  <View style={style.content}>
+import { connect } from 'react-redux'
+
+import { bindActionCreators } from 'redux'
+
+import { handleAuth } from '../actions'
+
+const Menu = props => (
+  <ImageBackground resizeMode="cover" source={require('../assets/bg.png')} style={style.content}>
     <View style={style.logoTipo}>
       <Image style={style.logo} source={require('../assets/react.png')} />
-      <Text style={style.title}>Just React</Text>
+      <Text style={style.title}>React Native</Text>
     </View>
-    <TouchableNativeFeedback>
+    <TouchableNativeFeedback onPress={props.handleAuth}>
       <View style={style.button}>
         <Text style={style.buttonText}>INICAR</Text>
       </View>
     </TouchableNativeFeedback>
-  </View>
+  </ImageBackground>
 )
 
 const style = StyleSheet.create({
@@ -21,7 +34,6 @@ const style = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#2d2d2d'
   },
   logoTipo: {
     flexDirection: 'row',
@@ -30,10 +42,10 @@ const style = StyleSheet.create({
   },
   logo: {
     marginBottom: 25,
-    marginRight: 5
+    marginRight: 3
   },
   title: {
-    fontSize: 32,
+    fontSize: 27,
     color: '#fafafa',
     fontWeight: 'bold',
     marginBottom: 30
@@ -55,4 +67,8 @@ const style = StyleSheet.create({
   }
 })
 
-export default Menu
+const mapDispatchToProps = (dispatch) => {
+  return bindActionCreators({ handleAuth }, dispatch)
+}
+
+export default connect(null, mapDispatchToProps)(Menu)
